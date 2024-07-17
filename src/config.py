@@ -17,7 +17,7 @@ class Config:
 
 config_path = "/../config.yaml"
 if os.getenv("IS_TEST", False):
-    config_path = "/../config.example.yaml"
+    config_path = "../config.example.yaml"
 
 with open(os.path.dirname(__file__) + config_path) as f:
     config_data = yaml.safe_load(f)

@@ -10,12 +10,12 @@ RUN apt-get update && apt-get install -y netcat
 COPY requirements.txt /code/requirements.txt
 RUN pip install -r requirements.txt
 
-COPY . /code/
+COPY cratd2c_stakingmanager_backend /code/
 
-COPY ./entrypoint.sh /
+COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 
-COPY ./test-start /test-start
+COPY test-start /test-start
 RUN chmod +x /test-start
 
 ENTRYPOINT ["/entrypoint.sh"]

@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.10
 
 ENV PYTHONUNBUFFERED=1
 
@@ -14,13 +14,13 @@ RUN poetry config virtualenvs.create false \
   && poetry install --no-interaction --no-ansi
 
 
-COPY ./runserver.sh /
+COPY runserver.sh /
 RUN chmod +x /runserver.sh
 
 EXPOSE 8000
 
-COPY . /code/
+COPY cratd2c_stakingmanager_backend /code/
 
-COPY ./entrypoint.sh /
+COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]

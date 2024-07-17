@@ -10,8 +10,8 @@ services:
     container_name: cratd2c_stakingmanager_backend_db
   web: &web
     build:
-      context: .
-      dockerfile: ./Dockerfile
+      context: cratd2c_stakingmanager_backend
+      dockerfile: Dockerfile
     env_file:
       - ./.env
     ports:
