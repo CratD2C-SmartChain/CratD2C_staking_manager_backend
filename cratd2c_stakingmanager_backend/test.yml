@@ -1,0 +1,23 @@
+services:
+  test-db:
+    image: postgres:14.0
+    environment:
+      - POSTGRES_USER=test_user
+      - POSTGRES_PASSWORD=test_password
+      - POSTGRES_HOST=test-db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=test_db
+  test-web:
+    build:
+      context: .
+      dockerfile: test.Dockerfile
+    environment:
+      - IS_TEST=1
+      - POSTGRES_USER=test_user
+      - POSTGRES_PASSWORD=test_password
+      - POSTGRES_HOST=test-db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=test_db
+    depends_on:
+      - test-db
+    command: /test-start

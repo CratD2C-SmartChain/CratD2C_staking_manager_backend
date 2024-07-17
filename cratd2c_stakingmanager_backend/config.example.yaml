@@ -1,0 +1,9 @@
+DEBUG: true
+SECRET_KEY: 'Django secret key'
+ALLOWED_HOSTS: 
+  - 'localhost'
+SWAGGER_TITLE: cratd2c_stakingManager_backend
+SWAGGER_DESCRIPTION: 'API for cratd2c_stakingManager_backend'
+
+REDIS_HOST: 'redis'
+REDIS_PORT: '6379'

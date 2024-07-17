@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "cratd2c_stakingManager_backend"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+Django = "^3.2.11"
+djangorestframework = "^3.12.2"
+drf-yasg = "^1.20.0"
+psycopg2-binary = "^2.8.6"
+marshmallow = "^3.14.1"
+marshmallow-dataclass = "^8.5.3"
+marshmallow-enum = "^1.5.1"
+PyYAML = "^6.0"
+django-extensions = "^3.1.5"
+ptpython = "^3.0.20"
+pytest-django = "^4.4.0"
+mixer = "^7.2.0"
+Faker = "^12.0.0"
+web3 = { git = "https://github.com/Rock-n-Block/web3.py.git" }
+redis = "^3.5.3"
+celery = "^5.1.2"
+django-celery-beat = "^2.2.1"
+
+
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
