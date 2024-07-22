@@ -33,3 +33,9 @@ class ValidatorCreateSerializer(serializers.ModelSerializer):
     def check_balance(cls, address):
         if not network.check_address(address):
             raise BalanceError
+
+
+class ValidatorSetUpSerializer(serializers.Serializer):
+    address = serializers.CharField()
+    commission = serializers.IntegerField()
+    amount = serializers.IntegerField()

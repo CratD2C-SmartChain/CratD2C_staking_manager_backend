@@ -9,6 +9,7 @@ from marshmallow_dataclass import class_schema
 class Blockchain:
     MIN_VALIDATOR_AMOUNT: int
     PROVIDER: str
+    STAKING_CONTRACT_ADDRESS: str
 
 
 @dataclass

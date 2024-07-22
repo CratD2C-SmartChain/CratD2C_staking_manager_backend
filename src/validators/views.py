@@ -1,10 +1,12 @@
+from django.core.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 
-from src.validators.serializers import ValidatorSerializer, ValidatorCreateSerializer
+from src.validators.serializers import ValidatorSerializer, ValidatorCreateSerializer, ValidatorSetUpSerializer
 from src.validators.models import Validator
+from src.validators.utils import staking_processor
 
 
 class ValidatorView(APIView):
@@ -32,10 +34,18 @@ class ValidatorView(APIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
-# class SetUpValidatorView(APIView):
-#     @swagger_auto_schema(
-#         operation_description="Get transaction payload",
-#         responses={status.HTTP_200_OK: ""},
-#     )
-#     def get(self, request):
-#         ...
+class SetUpValidatorView(APIView):
+    @swagger_auto_schema(
+        operation_description="Get transaction payload",
+        query_serializer=ValidatorSetUpSerializer(),
+        responses={status.HTTP_200_OK: ""},
+    )
+    def get(self, request):
+        serializer = ValidatorSetUpSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        validator_address = serializer.validated_data.get("address")
+        validator = Validator.objects.filter(address__iexact=validator_address).first()
+        if validator is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        data = staking_processor.deposit_as_validator(serializer.validated_data.get("commission"), serializer.validated_data.get("amount"), validator.address)
+        return Response(data=data, status=status.HTTP_200_OK)

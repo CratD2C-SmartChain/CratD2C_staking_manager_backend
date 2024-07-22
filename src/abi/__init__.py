@@ -1,0 +1,1 @@
+from .staking import staking_abi
