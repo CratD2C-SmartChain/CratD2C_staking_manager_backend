@@ -8,7 +8,7 @@ WORKDIR /code
 RUN apt-get update && apt-get install -y netcat-traditional
 RUN pip install --upgrade pip
 
-RUN pip install "poetry==1.1.12"
+RUN pip install "poetry"
 COPY pyproject.toml /code/
 RUN poetry config virtualenvs.create false \
   && poetry install --no-interaction --no-ansi
@@ -19,7 +19,7 @@ RUN chmod +x /runserver.sh
 
 EXPOSE 8000
 
-COPY cratd2c_stakingmanager_backend /code/
+COPY . /code/
 
 COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
