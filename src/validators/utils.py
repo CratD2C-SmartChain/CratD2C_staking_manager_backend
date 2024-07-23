@@ -32,6 +32,12 @@ class ContractProcessor:
         }
         return data
 
+    def get_block_from_tx(self, tx_hash, address_from):
+        tx = self.rpc.eth.get_transaction(tx_hash)
+        if tx["from"] == address_from:
+            return tx.block
+        return None
+
 
 staking_processor = ContractProcessor(
     abi=staking_abi,

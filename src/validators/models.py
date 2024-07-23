@@ -1,5 +1,7 @@
 from django.db import models
 
+from src.utilities import network, config
+
 
 class Validator(models.Model):
     
@@ -43,3 +45,9 @@ class Validator(models.Model):
         verbose_name="Address",
         unique=True,
     )
+
+    @property
+    def checkpoints(self):
+        if not self.start_block:
+            return 0
+        return (network.block_number - self.start_block) // config.BLOCKCHAIN.EPOCH_LEN

@@ -1,3 +1,5 @@
+import time
+
 import redis
 from web3 import Web3, HTTPProvider
 
@@ -26,6 +28,8 @@ class RedisClient:
 class Network:
     def __init__(self) -> None:
         self._rpc = None
+        self._block_number = None
+        self._block_time = None
 
     @property
     def rpc(self):
@@ -35,6 +39,13 @@ class Network:
 
     def check_balance(self, address) -> bool:
         return self.rpc.eth.get_balance(address) > config.BLOCKCHAIN.MIN_VALIDATOR_AMOUNT
+
+    @property
+    def block_number(self) -> int:
+        if self._block_number is None or (time.time() - self._block_time) > config.BLOCKCHAIN.BLOCK_REFRESH_TIME:
+            self._block_number = self.rpc.eth.block_number
+            self._block_time = int(time.time())
+        return self._block_number
 
 
 network = Network()

@@ -7,6 +7,8 @@ from src.utilities import network
 
 
 class ValidatorSerializer(serializers.ModelSerializer):
+    checkpoints = serializers.ReadOnlyField(read_only=True)
+
     class Meta:
         model = Validator
         fields = '__all__'
@@ -31,7 +33,7 @@ class ValidatorCreateSerializer(serializers.ModelSerializer):
 
     @classmethod
     def check_balance(cls, address):
-        if not network.check_address(address):
+        if not network.check_balance(address):
             raise BalanceError
 
 
@@ -39,3 +41,8 @@ class ValidatorSetUpSerializer(serializers.Serializer):
     address = serializers.CharField()
     commission = serializers.IntegerField()
     amount = serializers.IntegerField()
+
+
+class TransactionSerializer(serializers.Serializer):
+    tx_hash = serializers.CharField()
+    address = serializers.CharField()

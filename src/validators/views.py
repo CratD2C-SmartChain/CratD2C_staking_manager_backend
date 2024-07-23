@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 
-from src.validators.serializers import ValidatorSerializer, ValidatorCreateSerializer, ValidatorSetUpSerializer
+from src.validators.serializers import ValidatorSerializer, ValidatorCreateSerializer, ValidatorSetUpSerializer, TransactionSerializer
 from src.validators.models import Validator
 from src.validators.utils import staking_processor
 
@@ -49,3 +49,26 @@ class SetUpValidatorView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         data = staking_processor.deposit_as_validator(serializer.validated_data.get("commission"), serializer.validated_data.get("amount"), validator.address)
         return Response(data=data, status=status.HTTP_200_OK)
+
+
+class GetTransactionView(APIView):
+    @swagger_auto_schema(
+        operation_description="Get transaction hash",
+        responses={status.HTTP_200_OK: ""},
+        query_serializer=TransactionSerializer(),
+    )
+    def get(self, request):
+        serializer = TransactionSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        block = staking_processor.get_block(
+            serializer.validated_data.get("tx_hash"),
+            serializer.validated_data.get("address"),
+        )
+        if block is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        validator = Validator.objects.filter(address__iexact=serializer.validated_data.get("address")).first()
+        if validator is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        validator.start_block = block
+        validator.save()
+        return Response(status=status.HTTP_200_OK)

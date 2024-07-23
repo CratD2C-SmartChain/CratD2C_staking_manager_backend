@@ -10,6 +10,8 @@ class Blockchain:
     MIN_VALIDATOR_AMOUNT: int
     PROVIDER: str
     STAKING_CONTRACT_ADDRESS: str
+    BLOCK_REFRESH_TIME: int
+    EPOCH_LEN: int
 
 
 @dataclass
