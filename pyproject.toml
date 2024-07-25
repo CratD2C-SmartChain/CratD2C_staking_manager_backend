@@ -26,6 +26,7 @@ django-celery-beat = "^2.6.0"
 gunicorn = "^22.0.0"
 pillow = "^10.4.0"
 django-filter = "^24.2"
+drf-extra-fields = "^3.7.0"
 
 
 [build-system]

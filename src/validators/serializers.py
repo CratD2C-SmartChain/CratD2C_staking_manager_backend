@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from web3 import Web3
+from drf_extra_fields.fields import Base64ImageField
 
 from src.validators.models import Validator
 from src.validators.errors import AddressError, BalanceError
@@ -15,6 +16,7 @@ class ValidatorSerializer(serializers.ModelSerializer):
 
 
 class ValidatorCreateSerializer(serializers.ModelSerializer):
+    logo = Base64ImageField(required=True)
 
     class Meta:
         model = Validator
