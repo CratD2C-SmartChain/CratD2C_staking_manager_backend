@@ -45,6 +45,14 @@ class Validator(models.Model):
         verbose_name="Address",
         unique=True,
     )
+    description = models.TextField(
+        verbose_name="Description",
+        null=True,
+        blank=True,
+    )
+    website = models.URLField(null=True, blank=True, verbose_name="Website")
+    twitter = models.CharField(max_length=255, null=True, blank=True)
+    telegram = models.CharField(max_length=255, null=True, blank=True)
 
     @property
     def checkpoints(self):

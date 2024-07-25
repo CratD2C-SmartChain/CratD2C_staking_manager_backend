@@ -24,6 +24,11 @@ class ValidatorCreateSerializer(serializers.ModelSerializer):
             'name',
             'logo',
             'address',
+            'commission',
+            'description',
+            'twitter',
+            'telegram',
+            'website',
         )
 
     def validate_address(self, value):
