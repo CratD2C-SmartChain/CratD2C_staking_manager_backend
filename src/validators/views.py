@@ -1,24 +1,36 @@
-from django.core.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
+import django_filters.rest_framework
+from rest_framework import filters
 
 from src.validators.serializers import ValidatorSerializer, ValidatorCreateSerializer, ValidatorSetUpSerializer, TransactionSerializer
 from src.validators.models import Validator
 from src.validators.utils import staking_processor
+from src.validators.paginators import ValidatorPagination
 
 
-class ValidatorView(APIView):
+class ValidatorView(ListAPIView):
+    pagination_class = ValidatorPagination
+    serializer_class = ValidatorSerializer
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['=address']
+
+    def get_queryset(self):
+        sort_by = self.request.query_params.get('sort', '')
+        query = Validator.objects.all()
+        if sort_by:
+            query = query.order_by(sort_by)
+        return self.filter_queryset(query)
 
     @swagger_auto_schema(
         operation_description="List of validators",
         responses={status.HTTP_200_OK: ValidatorSerializer(many=True)},
     )
     def get(self, request):
-        validators = Validator.objects.all()
-        serializer = ValidatorSerializer(validators, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return super().get(request)
 
     @swagger_auto_schema(
         operation_description="Create a new validator",

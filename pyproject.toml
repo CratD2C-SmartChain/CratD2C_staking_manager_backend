@@ -25,6 +25,7 @@ celery = "^5.4.0"
 django-celery-beat = "^2.6.0"
 gunicorn = "^22.0.0"
 pillow = "^10.4.0"
+django-filter = "^24.2"
 
 
 [build-system]
