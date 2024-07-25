@@ -44,6 +44,19 @@ class ValidatorCreateSerializer(serializers.ModelSerializer):
             raise BalanceError
 
 
+class ValidatorUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Validator
+        fields = (
+            'name',
+            'logo',
+            'description',
+            'twitter',
+            'telegram',
+            'website',
+        )
+
+
 class ValidatorSetUpSerializer(serializers.Serializer):
     address = serializers.CharField()
     commission = serializers.IntegerField()

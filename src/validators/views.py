@@ -1,18 +1,25 @@
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListCreateAPIView, UpdateAPIView
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 import django_filters.rest_framework
 from rest_framework import filters
 
-from src.validators.serializers import ValidatorSerializer, ValidatorCreateSerializer, ValidatorSetUpSerializer, TransactionSerializer
+from src.validators.serializers import (
+    ValidatorSerializer,
+    ValidatorCreateSerializer,
+    ValidatorSetUpSerializer,
+    TransactionSerializer,
+    ValidatorUpdateSerializer,
+)
 from src.validators.models import Validator
 from src.validators.utils import staking_processor
 from src.validators.paginators import ValidatorPagination
 
 
-class ValidatorView(ListAPIView):
+class ValidatorView(ListCreateAPIView):
+    model = Validator
     pagination_class = ValidatorPagination
     serializer_class = ValidatorSerializer
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -44,6 +51,12 @@ class ValidatorView(ListAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=status.HTTP_201_CREATED)
+
+
+class ValidatorUpdateView(UpdateAPIView):
+    model = Validator
+    serializer_class = ValidatorUpdateSerializer
+    lookup_field = 'address'
 
 
 class SetUpValidatorView(APIView):
