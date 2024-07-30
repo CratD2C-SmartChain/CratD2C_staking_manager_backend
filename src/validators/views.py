@@ -48,7 +48,8 @@ class ValidatorView(ListCreateAPIView):
     )
     def post(self, request):
         serializer = ValidatorCreateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            return Response(data={"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
         instance = Validator.objects.get(address=serializer.validated_data['address'])
         serializer = ValidatorSerializer(instance=instance)
