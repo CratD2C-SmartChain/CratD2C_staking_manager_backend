@@ -23,7 +23,7 @@ class ValidatorView(ListCreateAPIView):
     pagination_class = ValidatorPagination
     serializer_class = ValidatorSerializer
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['=address']
+    search_fields = ['=address', 'name']
 
     def get_queryset(self):
         sort_by = self.request.query_params.get('sort', '')
