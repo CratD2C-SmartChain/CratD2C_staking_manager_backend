@@ -59,6 +59,7 @@ class ValidatorUpdateView(UpdateAPIView):
     model = Validator
     serializer_class = ValidatorUpdateSerializer
     lookup_field = 'address'
+    queryset = Validator.objects.all()
 
 
 class SetUpValidatorView(APIView):
