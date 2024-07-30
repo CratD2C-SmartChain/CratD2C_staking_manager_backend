@@ -50,7 +50,9 @@ class ValidatorView(ListCreateAPIView):
         serializer = ValidatorCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(data=serializer.validated_data, status=status.HTTP_201_CREATED)
+        instance = Validator.objects.get(pk=serializer.validated_data['address'])
+        serializer = ValidatorSerializer(instance=instance)
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
 
 class ValidatorUpdateView(UpdateAPIView):
