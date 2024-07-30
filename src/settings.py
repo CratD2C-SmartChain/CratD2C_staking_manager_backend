@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django_celery_beat",
     "src.validators",
     "src.accounts",
+    "src.statistic",
 ]
 
 MIDDLEWARE = [
@@ -158,3 +159,10 @@ SHELL_PLUS_IMPORTS = [
 ]
 CELERY_BROKER_URL = f"redis://{config.REDIS_HOST}:{config.REDIS_PORT}"
 CELERY_RESULT_BACKEND = f"redis://{config.REDIS_HOST}:{config.REDIS_PORT}"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{config.REDIS_HOST}:{config.REDIS_PORT}",
+    }
+}

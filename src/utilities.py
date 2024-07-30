@@ -2,6 +2,7 @@ import time
 
 import redis
 from web3 import Web3, HTTPProvider
+from web3.middleware import geth_poa_middleware
 
 from src.settings import config
 
@@ -35,6 +36,7 @@ class Network:
     def rpc(self):
         if self._rpc is None:
             self._rpc = Web3(HTTPProvider(config.BLOCKCHAIN.PROVIDER))
+            self._rpc.middleware_onion.inject(geth_poa_middleware, layer=0)
         return self._rpc
 
     def check_balance(self, address) -> bool:

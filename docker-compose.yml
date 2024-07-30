@@ -18,6 +18,7 @@ services:
       - "127.0.0.1:${DOCKER_EXPOSE_PORT?8000}:${DJANGO_PORT?8000}"
     depends_on:
       - db
+      - redis
     volumes:
       - ./src/:/code/src/
       - ./static/:/code/static/

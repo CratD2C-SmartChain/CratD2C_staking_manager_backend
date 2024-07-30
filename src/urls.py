@@ -27,6 +27,7 @@ urlpatterns = [
     ),
     path("api/v1/validators/", include("src.validators.urls")),
     path("api/v1/accounts/", include("src.accounts.urls")),
+    path("api/v1/staticstic/", include("src.statistic.urls")),
 ]
 
 
