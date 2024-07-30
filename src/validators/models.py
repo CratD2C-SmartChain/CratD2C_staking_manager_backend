@@ -53,6 +53,18 @@ class Validator(models.Model):
     website = models.URLField(null=True, blank=True, verbose_name="Website")
     twitter = models.CharField(max_length=255, null=True, blank=True)
     telegram = models.CharField(max_length=255, null=True, blank=True)
+    performance_index = models.DecimalField(
+        default=0,
+        decimal_places=2,
+        max_digits=16,
+        verbose_name="Performance Index",
+    )
+    penalty = models.DecimalField(
+        default=0,
+        decimal_places=0,
+        max_digits=256,
+        verbose_name="Penalty",
+    )
 
     @property
     def checkpoints(self):
