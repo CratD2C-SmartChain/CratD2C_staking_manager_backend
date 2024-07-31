@@ -28,6 +28,8 @@ class ValidatorView(ListCreateAPIView):
     def get_queryset(self):
         sort_by = self.request.query_params.get('sort', '')
         query = Validator.objects.all()
+        if addresses := self.request.data.get('addresses'):
+            query = query.filter(address__in=addresses.split(','))
         if sort_by:
             query = query.order_by(sort_by)
         return self.filter_queryset(query)
@@ -75,7 +77,11 @@ class SetUpValidatorView(APIView):
         validator = Validator.objects.filter(address__iexact=validator_address).first()
         if validator is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        data = staking_processor.deposit_as_validator(serializer.validated_data.get("commission"), serializer.validated_data.get("amount"), validator.address)
+        data = staking_processor.deposit_as_validator(
+            serializer.validated_data.get("commission"),
+            serializer.validated_data.get("amount"),
+            validator.address,
+        )
         return Response(data=data, status=status.HTTP_200_OK)
 
 

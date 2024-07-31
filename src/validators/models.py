@@ -66,6 +66,9 @@ class Validator(models.Model):
         verbose_name="Penalty",
     )
 
+    class Meta:
+        ordering = ('-id',)
+
     @property
     def checkpoints(self):
         if not self.start_block:
