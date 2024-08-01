@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.generics import ListCreateAPIView, UpdateAPIView
+from rest_framework.generics import ListCreateAPIView, UpdateAPIView, ListAPIView
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 import django_filters.rest_framework
@@ -111,7 +111,7 @@ class GetTransactionView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class ValidatorPostView(APIView, PageNumberPagination):
+class ValidatorPostView(ListAPIView, PageNumberPagination):
 
     pagination_class = ValidatorPagination
 
@@ -125,6 +125,6 @@ class ValidatorPostView(APIView, PageNumberPagination):
         serializer.is_valid(raise_exception=True)
         addresses = serializer.validated_data.get("addresses", "").split(",")
         validators = Validator.objects.filter(address__in=addresses).all()
-        result = self.paginate_queryset(validators, request)
+        result = self.paginate_queryset(validators)
         serializer = ValidatorSerializer(result, many=True)
         return self.get_paginated_response(serializer.data)
