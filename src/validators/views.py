@@ -111,9 +111,15 @@ class GetTransactionView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class ValidatorPostView(ListAPIView, PageNumberPagination):
+class ValidatorPostView(ListAPIView):
 
     pagination_class = ValidatorPagination
+    serializer_class = ValidatorPostSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context
 
     @swagger_auto_schema(
         operation_description="Get validators depends on body",
@@ -126,5 +132,6 @@ class ValidatorPostView(ListAPIView, PageNumberPagination):
         addresses = serializer.validated_data.get("addresses", "").split(",")
         validators = Validator.objects.filter(address__in=addresses).all()
         result = self.paginate_queryset(validators)
-        serializer = ValidatorSerializer(result, many=True)
+        serializer_class = self.get_serializer_class()
+        serializer = serializer_class(result, many=True)
         return self.get_paginated_response(serializer.data)
