@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 import django_filters.rest_framework
 from rest_framework import filters
-from rest_framework.pagination import PageNumberPagination
 
 from src.validators.serializers import (
     ValidatorSerializer,
@@ -116,11 +115,6 @@ class ValidatorPostView(ListAPIView):
     pagination_class = ValidatorPagination
     serializer_class = ValidatorSerializer
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context.update({"request": self.request})
-        return context
-
     @swagger_auto_schema(
         operation_description="Get validators depends on body",
         responses={status.HTTP_200_OK: ValidatorSerializer(many=True)},
@@ -133,5 +127,5 @@ class ValidatorPostView(ListAPIView):
         validators = Validator.objects.filter(address__in=addresses).all()
         result = self.paginate_queryset(validators)
         serializer_class = self.get_serializer_class()
-        serializer = serializer_class(result, many=True)
+        serializer = serializer_class(result, many=True, context={"request": request})
         return self.get_paginated_response(serializer.data)
