@@ -2416,6 +2416,23 @@ files = [
 ]
 
 [[package]]
+name = "shyaml"
+version = "0.6.2"
+description = "YAML for command line"
+optional = false
+python-versions = "*"
+files = [
+    {file = "shyaml-0.6.2-py2.py3-none-any.whl", hash = "sha256:d4849f0a280dea2da6d952539bc6a867ddf9c7026b026eb3170185e638da73ef"},
+    {file = "shyaml-0.6.2.tar.gz", hash = "sha256:696e94f1c49d496efa58e09b49c099f5ebba7e24b5abe334f15e9759740b7fd0"},
+]
+
+[package.dependencies]
+pyyaml = "*"
+
+[package.extras]
+test = ["docshtest (==0.0.3)"]
+
+[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -2775,4 +2792,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "fe1dde66ab67f8a69380254bb1c8382710743e005b04fb1a16fe8310049c7b84"
+content-hash = "9bd52643cb825521afb10d90dca4c38d442ad97cc9e3ca12c5ada1943ef6eaa5"
