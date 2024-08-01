@@ -114,7 +114,7 @@ class GetTransactionView(APIView):
 class ValidatorPostView(ListAPIView):
 
     pagination_class = ValidatorPagination
-    serializer_class = ValidatorPostSerializer
+    serializer_class = ValidatorSerializer
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
