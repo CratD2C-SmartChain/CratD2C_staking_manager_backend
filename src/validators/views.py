@@ -127,4 +127,4 @@ class ValidatorPostView(APIView, PageNumberPagination):
         validators = Validator.objects.filter(address__in=addresses).all()
         result = self.paginate_queryset(validators, request)
         serializer = ValidatorSerializer(result, many=True)
-        return Response(data=serializer.data, status=status.HTTP_200_OK)
+        return self.get_paginated_response(serializer.data)
