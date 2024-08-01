@@ -57,6 +57,10 @@ class ValidatorUpdateSerializer(serializers.ModelSerializer):
         )
 
 
+class ValidatorPostSerializer(serializers.Serializer):
+    addresses = serializers.CharField(read_only=True)
+
+
 class ValidatorSetUpSerializer(serializers.Serializer):
     address = serializers.CharField()
     commission = serializers.IntegerField()

@@ -12,6 +12,7 @@ from src.validators.serializers import (
     ValidatorSetUpSerializer,
     TransactionSerializer,
     ValidatorUpdateSerializer,
+    ValidatorPostSerializer,
 )
 from src.validators.models import Validator
 from src.validators.utils import staking_processor
@@ -28,8 +29,8 @@ class ValidatorView(ListCreateAPIView):
     def get_queryset(self):
         sort_by = self.request.query_params.get('sort', '')
         query = Validator.objects.all()
-        if addresses := self.request.data.get('addresses'):
-            query = query.filter(address__in=addresses.split(','))
+        # if addresses := self.request.data.get('addresses'):
+        #     query = query.filter(address__in=addresses.split(','))
         if sort_by:
             query = query.order_by(sort_by)
         return self.filter_queryset(query)
@@ -104,5 +105,22 @@ class GetTransactionView(APIView):
         if validator is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         validator.start_block = block
+        validator.status = Validator.ValidatorStatus.HEALTHY
         validator.save()
         return Response(status=status.HTTP_200_OK)
+
+
+class ValidatorPostView(APIView):
+
+    @swagger_auto_schema(
+        operation_description="Get validators depends on body",
+        responses={status.HTTP_200_OK: ValidatorSerializer(many=True)},
+        request_body=ValidatorPostSerializer(),
+    )
+    def post(self, request):
+        serializer = ValidatorPostSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        addresses = serializer.validated_data.get("addresses", "").split(",")
+        validators = Validator.objects.filter(address__in=addresses).all()
+        serializer = ValidatorSerializer(validators, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
