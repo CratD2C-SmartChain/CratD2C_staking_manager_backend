@@ -4,7 +4,7 @@ from src.validators.utils import contract_processor
 from src.validators.models import Validator
 
 
-@shared_task
+@shared_task(name="update_active_validators_amounts")
 def update_active_validators_amounts():
     data = contract_processor.get_active_validators_info()
     for address, amount in data:
