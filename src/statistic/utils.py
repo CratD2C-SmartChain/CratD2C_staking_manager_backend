@@ -7,7 +7,7 @@ class IntervalProcessor:
         self.network = network
 
     def get_interval(self):
-        last_block = self.network.rpc.eth.blockNumber
+        last_block = self.network.rpc.eth.block_number
         current_checkpoint_block = last_block - last_block % config.BLOCKCHAIN.EPOCH_LEN
         if current_checkpoint_block < config.BLOCKCHAIN.EPOCH_LEN:
             return 0
