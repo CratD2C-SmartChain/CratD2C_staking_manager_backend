@@ -15,7 +15,7 @@ from src.validators.serializers import (
     ValidatorPostSerializer,
 )
 from src.validators.models import Validator
-from src.validators.utils import staking_processor
+from src.validators.utils import contract_processor
 from src.validators.paginators import ValidatorPagination
 
 
@@ -78,7 +78,7 @@ class SetUpValidatorView(APIView):
         validator = Validator.objects.filter(address__iexact=validator_address).first()
         if validator is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        data = staking_processor.deposit_as_validator(
+        data = contract_processor.deposit_as_validator(
             serializer.validated_data.get("commission"),
             serializer.validated_data.get("amount"),
             validator.address,
@@ -95,7 +95,7 @@ class GetTransactionView(APIView):
     def get(self, request):
         serializer = TransactionSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
-        block = staking_processor.get_block_from_tx(
+        block = contract_processor.get_block_from_tx(
             serializer.validated_data.get("tx_hash"),
             serializer.validated_data.get("address"),
         )

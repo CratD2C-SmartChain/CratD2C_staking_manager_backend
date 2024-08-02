@@ -10,10 +10,16 @@ class ContractProcessor:
         self.abi = abi
         self.rpc = rpc
         self.address = self.rpc.to_checksum_address(address)
+        self._contract = None
+
+    @property
+    def contract(self):
+        if self._contract is None:
+            self._contract = self.rpc.eth.contract(abi=self.abi, address=self.address)
+        return self._contract
 
     def create_call_data(self, function_name, params):
-        contract = self.rpc.eth.contract(abi=self.abi, address=self.address)
-        function = getattr(contract.functions, function_name)
+        function = getattr(self.contract.functions, function_name)
         return function(*params)
 
     def deposit_as_validator(self, commission, amount, address):
@@ -38,8 +44,13 @@ class ContractProcessor:
             return tx["blockNumber"]
         return None
 
+    def get_active_validators_info(self) -> tuple:
+        validators, amounts = self.contract.functions.activeValidators().call()
+        amounts = [a[0] for a in amounts]
+        return zip(validators, amounts)
 
-staking_processor = ContractProcessor(
+
+contract_processor = ContractProcessor(
     abi=staking_abi,
     rpc=network.rpc,
     address=config.BLOCKCHAIN.STAKING_CONTRACT_ADDRESS,
