@@ -45,7 +45,7 @@ class ContractProcessor:
         return None
 
     def get_active_validators_info(self) -> tuple:
-        validators, amounts = self.contract.functions.activeValidators().call()
+        validators, amounts = self.contract.functions.getActiveValidators().call()
         amounts = [a[0] for a in amounts]
         return zip(validators, amounts)
 
