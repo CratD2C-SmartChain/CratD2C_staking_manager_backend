@@ -95,7 +95,7 @@ class GetTransactionView(APIView):
     def get(self, request):
         serializer = TransactionSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
-        block = staking_processor.get_block(
+        block = staking_processor.get_block_from_tx(
             serializer.validated_data.get("tx_hash"),
             serializer.validated_data.get("address"),
         )
