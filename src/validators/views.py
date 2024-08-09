@@ -28,7 +28,7 @@ class ValidatorView(ListCreateAPIView):
 
     def get_queryset(self):
         sort_by = self.request.query_params.get('sort', '')
-        query = Validator.objects.filter(status__in=Validator.validator_view_statuses)
+        query = Validator.objects.filter(status__in=Validator.validator_view_statuses())
         # if addresses := self.request.data.get('addresses'):
         #     query = query.filter(address__in=addresses.split(','))
         if sort_by:

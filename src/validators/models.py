@@ -75,6 +75,6 @@ class Validator(models.Model):
             return 0
         return (network.block_number - self.start_block) // config.BLOCKCHAIN.EPOCH_LEN
 
-    @property
-    def validator_view_statuses(self):
+    @classmethod
+    def validator_view_statuses(cls):
         return [self.ValidatorStatus.CREATED, self.ValidatorStatus.HEALTHY, self.ValidatorStatus.STOPPED]
