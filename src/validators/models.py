@@ -77,4 +77,4 @@ class Validator(models.Model):
 
     @classmethod
     def validator_view_statuses(cls):
-        return [self.ValidatorStatus.CREATED, self.ValidatorStatus.HEALTHY, self.ValidatorStatus.STOPPED]
+        return [cls.ValidatorStatus.CREATED, cls.ValidatorStatus.HEALTHY, cls.ValidatorStatus.STOPPED]
