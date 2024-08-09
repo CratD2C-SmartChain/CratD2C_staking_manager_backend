@@ -49,6 +49,10 @@ class ContractProcessor:
         amounts = [a[0] + a[1] for a in amounts]
         return validators, amounts
 
+    def get_stopped_validators_info(self) -> set | list | None:
+        validators, _ = self.contract.functions.getStoppedValidators().call()
+        return set(validators) if validators else None
+
 
 contract_processor = ContractProcessor(
     abi=staking_abi,

@@ -24,4 +24,10 @@ app.conf.beat_schedule = {
             minute="*/5"
         ),
     },
+    "update_archived_validators": {
+        "task": "update_archived_validators",
+        "schedule": crontab(
+            minute="*/10"
+        ),
+    },
 }
