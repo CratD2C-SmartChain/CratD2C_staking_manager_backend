@@ -10,10 +10,14 @@ def update_active_validators_amounts():
     data = zip(validators, amount)
     for address, amount in data:
         validator = Validator.objects.filter(address=address).first()
-        if validator and validator.stake_amount != amount:
+        if validator:
             validator.stake_amount = amount
+            if validator.status != Validator.ValidatorStatus.HEALTHY:
+                validator.status = Validator.ValidatorStatus.HEALTHY
             validator.save()
-    db_validators = Validator.objects.filter(status=Validator.ValidatorStatus.HEALTHY).values_list('address', flat=True)
+
+    db_validators = Validator.objects.filter(
+        status=Validator.ValidatorStatus.HEALTHY).values_list('address', flat=True)
     validators_contract_set = set(validators)
     validators_db_set = set(db_validators)
     difference = validators_db_set.difference(validators_contract_set)
@@ -35,5 +39,6 @@ def update_archived_validators():
     for address in difference:
         validator = Validator.objects.filter(address=address).first()
         if validator:
-            validator.status = Validator.ValidatorStatus.ARCHIVED
+            is_validator = contract_processor.is_validator(address)
+            validator.status = Validator.ValidatorStatus.HEALTHY if is_validator else Validator.ValidatorStatus.ARCHIVED
             validator.save()

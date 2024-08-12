@@ -53,6 +53,11 @@ class ContractProcessor:
         validators, _ = self.contract.functions.getStoppedValidators().call()
         return set(validators) if validators else None
 
+    def is_validator_active(self, address):
+        address = self.rpc.to_checksum_address(address)
+        is_validator = self.contract.functions.isValidator(address).call()
+        return is_validator
+
 
 contract_processor = ContractProcessor(
     abi=staking_abi,
