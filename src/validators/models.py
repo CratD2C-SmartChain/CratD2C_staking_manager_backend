@@ -53,12 +53,6 @@ class Validator(models.Model):
     website = models.URLField(null=True, blank=True, verbose_name="Website")
     twitter = models.CharField(max_length=255, null=True, blank=True)
     telegram = models.CharField(max_length=255, null=True, blank=True)
-    performance_index = models.DecimalField(
-        default=0,
-        decimal_places=2,
-        max_digits=16,
-        verbose_name="Performance Index",
-    )
     penalty = models.DecimalField(
         default=0,
         decimal_places=0,
@@ -74,6 +68,12 @@ class Validator(models.Model):
         if not self.start_block:
             return 0
         return (network.block_number - self.start_block) // config.BLOCKCHAIN.EPOCH_LEN
+
+    @property
+    def performance_index(self):
+        return (
+                (self.checkpoints - self.penalty) * 100 // self.checkpoints
+        )
 
     @classmethod
     def validator_view_statuses(cls):

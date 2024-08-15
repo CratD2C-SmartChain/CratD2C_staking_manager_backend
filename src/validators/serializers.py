@@ -9,6 +9,7 @@ from src.utilities import network
 
 class ValidatorSerializer(serializers.ModelSerializer):
     checkpoints = serializers.ReadOnlyField(read_only=True)
+    performance_index = serializers.ReadOnlyField(read_only=True)
 
     class Meta:
         model = Validator

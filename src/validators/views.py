@@ -144,11 +144,5 @@ class ValidatorPenaltyView(APIView):
         validator = Validator.objects.filter(address__iexact=serializer.validated_data.get("address")).first()
         if validator:
             validator.penalty = validator.penalty + 1
-            if validator.checkpoints:
-                validator.performance_index = (
-                        (validator.checkpoints - validator.penalty) * 100 // validator.checkpoints
-                )
-            else:
-                validator.performance_index = 0
             validator.save()
         return Response(status=status.HTTP_200_OK)
