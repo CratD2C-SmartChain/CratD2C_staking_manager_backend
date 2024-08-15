@@ -49,9 +49,9 @@ class ContractProcessor:
         amounts = [a[0] + a[1] for a in amounts]
         return validators, amounts
 
-    def get_stopped_validators_info(self) -> set | list | None:
-        validators, _ = self.contract.functions.getStoppedValidators().call()
-        return set(validators) if validators else None
+    def get_stopped_validators_info(self) -> tuple:
+        validators, amounts = self.contract.functions.getStoppedValidators().call()
+        return set(validators) if validators else None, amounts
 
     def is_validator_active(self, address):
         address = self.rpc.to_checksum_address(address)
@@ -60,7 +60,7 @@ class ContractProcessor:
 
     def get_validator_info(self, address):
         info = self.contract.functions.getValidatorInfo(address).call()
-        return info
+        return info[0] + info[8] + info[9]
 
 
 contract_processor = ContractProcessor(

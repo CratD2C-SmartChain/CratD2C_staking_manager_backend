@@ -30,9 +30,14 @@ def update_active_validators_amounts():
 
 @shared_task(name="update_archived_validators")
 def update_archived_validators():
-    validators = contract_processor.get_stopped_validators_info()
+    validators, amounts = contract_processor.get_stopped_validators_info()
     if validators is None:
         return None
+    for i, validator in enumerate(validators):
+        db_validator = Validator.objects.filter(address__iexact=validator).first()
+        if db_validator:
+            db_validator.total_stake = sum(amounts[i])
+            db_validator.save()
     db_validators = Validator.objects.filter(status=Validator.ValidatorStatus.STOPPED).values_list('address', flat=True)
     validators_db_set = set(db_validators)
     difference = validators_db_set.difference(validators)
