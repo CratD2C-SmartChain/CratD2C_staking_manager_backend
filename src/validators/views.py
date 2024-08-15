@@ -13,6 +13,7 @@ from src.validators.serializers import (
     TransactionSerializer,
     ValidatorUpdateSerializer,
     ValidatorPostSerializer,
+    PenaltySerializer,
 )
 from src.validators.models import Validator
 from src.validators.utils import contract_processor
@@ -108,6 +109,8 @@ class GetTransactionView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         validator.start_block = block
         validator.status = Validator.ValidatorStatus.HEALTHY
+        if validator.performance_index == 0:
+            validator.performance_index = 100
         validator.save()
         return Response(status=status.HTTP_200_OK)
 
@@ -131,3 +134,21 @@ class ValidatorPostView(ListAPIView):
         serializer_class = self.get_serializer_class()
         serializer = serializer_class(result, many=True, context={"request": request})
         return self.get_paginated_response(serializer.data)
+
+
+class ValidatorPenaltyView(APIView):
+
+    def post(self, request):
+        serializer = PenaltySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        validator = Validator.objects.filter(address__iexact=serializer.validated_data.get("address")).first()
+        if validator:
+            validator.penalty = validator.penalty + 1
+            if validator.checkpoints:
+                validator.performance_index = (
+                        (validator.checkpoints - validator.penalty) * 100 // validator.checkpoints
+                )
+            else:
+                validator.performance_index = 0
+            validator.save()
+        return Response(status=status.HTTP_200_OK)

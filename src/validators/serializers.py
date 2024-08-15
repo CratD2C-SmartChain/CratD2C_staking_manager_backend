@@ -70,3 +70,7 @@ class ValidatorSetUpSerializer(serializers.Serializer):
 class TransactionSerializer(serializers.Serializer):
     tx_hash = serializers.CharField()
     address = serializers.CharField()
+
+
+class PenaltySerializer(serializers.Serializer):
+    address = serializers.CharField()

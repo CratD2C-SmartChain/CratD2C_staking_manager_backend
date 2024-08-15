@@ -6,6 +6,7 @@ from src.validators.views import (
     GetTransactionView,
     ValidatorUpdateView,
     ValidatorPostView,
+    ValidatorPenaltyView
 )
 
 urlpatterns = [
@@ -14,4 +15,5 @@ urlpatterns = [
     path('calldata', SetUpValidatorView.as_view(), name='set-up-validator'),
     path('transaction', GetTransactionView.as_view(), name='get-transaction'),
     path('delegator', ValidatorPostView.as_view(), name='validators-delegators'),
+    path('penalty', ValidatorPenaltyView.as_view(), name='validators-penalty'),
     ]
