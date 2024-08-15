@@ -71,6 +71,8 @@ class Validator(models.Model):
 
     @property
     def performance_index(self):
+        if self.checkpoints == 0:
+            return 100
         return (
                 (self.checkpoints - self.penalty) * 100 // self.checkpoints
         )
