@@ -58,6 +58,10 @@ class ContractProcessor:
         is_validator = self.contract.functions.isValidator(address).call()
         return is_validator
 
+    def get_validator_info(self, address):
+        info = self.contract.functions.getValidatorInfo(address).call()
+        return info
+
 
 contract_processor = ContractProcessor(
     abi=staking_abi,
