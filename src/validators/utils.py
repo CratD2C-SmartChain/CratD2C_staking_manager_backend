@@ -62,6 +62,10 @@ class ContractProcessor:
         info = self.contract.functions.getValidatorInfo(address).call()
         return info[0] + info[8] + info[9]
 
+    def get_delegator_info_per_validator(self, address) -> set:
+        delegators, *_ = self.contract.functions.getDelegatorsInfoPerValidator(address).call()
+        return set(delegators)
+
 
 contract_processor = ContractProcessor(
     abi=staking_abi,

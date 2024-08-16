@@ -21,13 +21,19 @@ app.conf.beat_schedule = {
     "update_active_validators_amounts": {
         "task": "update_active_validators_amounts",
         "schedule": crontab(
-            minute="*/5"
+            minute="*/1"
         ),
     },
     "update_archived_validators": {
         "task": "update_archived_validators",
         "schedule": crontab(
-            minute="*/10"
+            minute="*/1"
+        ),
+    },
+    "update_total_delegators": {
+        "task": "update_total_delegators",
+        "schedule": crontab(
+            minute="*/1"
         ),
     },
 }

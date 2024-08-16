@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from src.statistic.utils import i_processor
+from src.statistic.models import DelegatorsInfo
 
 
 class StatisticView(APIView):
@@ -13,3 +14,11 @@ class StatisticView(APIView):
     def get(self, request):
         interval = i_processor.get_interval()
         return Response(f"{interval}", status=status.HTTP_200_OK)
+
+
+class DelegatorsInfoView(APIView):
+
+    @method_decorator(cache_page(60))
+    def get(self, request):
+        delegators_info, _ = DelegatorsInfo.objects.get_or_create()
+        return Response(f"{delegators_info.total_delegators}", status=status.HTTP_200_OK)
