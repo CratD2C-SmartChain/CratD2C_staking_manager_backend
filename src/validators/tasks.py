@@ -40,7 +40,7 @@ def update_archived_validators():
     validators_db_set = set(db_validators)
     difference = validators_db_set.difference(validators)
     for address in difference:
-        validator = Validator.objects.filter(address=address).first()
+        validator = Validator.objects.filter(address__iexact=address).first()
         if validator:
             is_validator = contract_processor.is_validator_active(address)
             validator.status = Validator.ValidatorStatus.HEALTHY if is_validator else Validator.ValidatorStatus.ARCHIVED
