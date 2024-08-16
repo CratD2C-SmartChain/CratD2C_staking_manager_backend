@@ -34,7 +34,7 @@ def update_archived_validators():
     for i, validator in enumerate(validators):
         db_validator = Validator.objects.filter(address__iexact=validator).first()
         if db_validator:
-            db_validator.total_stake = sum(amounts[i])
+            db_validator.stake_amount = sum(amounts[i])
             db_validator.save()
     db_validators = Validator.objects.filter(status=Validator.ValidatorStatus.STOPPED).values_list('address', flat=True)
     validators_db_set = set(db_validators)
