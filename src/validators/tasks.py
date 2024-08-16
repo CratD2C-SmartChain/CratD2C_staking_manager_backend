@@ -31,8 +31,6 @@ def update_active_validators_amounts():
 @shared_task(name="update_archived_validators")
 def update_archived_validators():
     validators, amounts = contract_processor.get_stopped_validators_info()
-    if validators is None:
-        return None
     for i, validator in enumerate(validators):
         db_validator = Validator.objects.filter(address__iexact=validator).first()
         if db_validator:
