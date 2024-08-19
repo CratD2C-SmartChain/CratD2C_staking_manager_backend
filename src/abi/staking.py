@@ -357,19 +357,6 @@ staking_abi = [
     {
         "inputs": [
             {
-                "internalType": "uint256",
-                "name": "value",
-                "type": "uint256"
-            }
-        ],
-        "name": "changeTestTime",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
                 "internalType": "address",
                 "name": "validator",
                 "type": "address"
@@ -616,7 +603,7 @@ staking_abi = [
                                 "type": "uint256"
                             }
                         ],
-                        "internalType": "struct CRATStakeManagerTest.FixedReward",
+                        "internalType": "struct CRATStakeManager.FixedReward",
                         "name": "fixedReward",
                         "type": "tuple"
                     },
@@ -633,12 +620,12 @@ staking_abi = [
                                 "type": "uint256"
                             }
                         ],
-                        "internalType": "struct CRATStakeManagerTest.VariableReward",
+                        "internalType": "struct CRATStakeManager.VariableReward",
                         "name": "variableReward",
                         "type": "tuple"
                     }
                 ],
-                "internalType": "struct CRATStakeManagerTest.DelegatorPerValidatorInfo[]",
+                "internalType": "struct CRATStakeManager.DelegatorPerValidatorInfo[]",
                 "name": "delegatorPerValidatorArr",
                 "type": "tuple[]"
             },
@@ -716,7 +703,7 @@ staking_abi = [
                                 "type": "uint256"
                             }
                         ],
-                        "internalType": "struct CRATStakeManagerTest.FixedReward",
+                        "internalType": "struct CRATStakeManager.FixedReward",
                         "name": "fixedReward",
                         "type": "tuple"
                     },
@@ -733,12 +720,12 @@ staking_abi = [
                                 "type": "uint256"
                             }
                         ],
-                        "internalType": "struct CRATStakeManagerTest.VariableReward",
+                        "internalType": "struct CRATStakeManager.VariableReward",
                         "name": "variableReward",
                         "type": "tuple"
                     }
                 ],
-                "internalType": "struct CRATStakeManagerTest.DelegatorPerValidatorInfo[]",
+                "internalType": "struct CRATStakeManager.DelegatorPerValidatorInfo[]",
                 "name": "delegatorPerValidatorArr",
                 "type": "tuple[]"
             }
@@ -843,7 +830,7 @@ staking_abi = [
                                 "type": "uint256"
                             }
                         ],
-                        "internalType": "struct CRATStakeManagerTest.FixedReward",
+                        "internalType": "struct CRATStakeManager.FixedReward",
                         "name": "fixedReward",
                         "type": "tuple"
                     },
@@ -860,7 +847,7 @@ staking_abi = [
                                 "type": "uint256"
                             }
                         ],
-                        "internalType": "struct CRATStakeManagerTest.VariableReward",
+                        "internalType": "struct CRATStakeManager.VariableReward",
                         "name": "variableReward",
                         "type": "tuple"
                     },
@@ -877,7 +864,7 @@ staking_abi = [
                                 "type": "uint256"
                             }
                         ],
-                        "internalType": "struct CRATStakeManagerTest.SlashPenaltyCalculation",
+                        "internalType": "struct CRATStakeManager.SlashPenaltyCalculation",
                         "name": "penalty",
                         "type": "tuple"
                     },
@@ -912,7 +899,7 @@ staking_abi = [
                         "type": "uint256"
                     }
                 ],
-                "internalType": "struct CRATStakeManagerTest.ValidatorInfoView",
+                "internalType": "struct CRATStakeManager.ValidatorInfoView",
                 "name": "info",
                 "type": "tuple"
             }
@@ -1292,7 +1279,7 @@ staking_abi = [
                         "type": "uint256"
                     }
                 ],
-                "internalType": "struct CRATStakeManagerTest.RoleSettings",
+                "internalType": "struct CRATStakeManager.RoleSettings",
                 "name": "validatorsSettings",
                 "type": "tuple"
             },
@@ -1324,7 +1311,7 @@ staking_abi = [
                         "type": "uint256"
                     }
                 ],
-                "internalType": "struct CRATStakeManagerTest.RoleSettings",
+                "internalType": "struct CRATStakeManager.RoleSettings",
                 "name": "delegatorsSettings",
                 "type": "tuple"
             }
@@ -1385,19 +1372,6 @@ staking_abi = [
                 "internalType": "bool",
                 "name": "",
                 "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "testTime",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
             }
         ],
         "stateMutability": "view",
@@ -1586,16 +1560,16 @@ staking_abi = [
         "inputs": [
             {
                 "internalType": "address",
-                "name": "delegator",
+                "name": "validator",
                 "type": "address"
             },
             {
-                "internalType": "address",
-                "name": "validator",
-                "type": "address"
+                "internalType": "address[]",
+                "name": "delegators",
+                "type": "address[]"
             }
         ],
-        "name": "withdrawForDelegator",
+        "name": "withdrawForDelegators",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
