@@ -30,6 +30,11 @@ class ValidatorView(ListCreateAPIView):
     def get_queryset(self):
         sort_by = self.request.query_params.get('sort', '')
         query = Validator.objects.filter(status__in=Validator.validator_view_statuses())
+        if self.request.user.is_authenticated:
+            query = query.union(Validator.objects.filter(
+                status=Validator.ValidatorStatus.CREATED,
+                address=self.request.user.username
+            ))
         if sort_by:
             query = query.order_by(sort_by)
         return self.filter_queryset(query)

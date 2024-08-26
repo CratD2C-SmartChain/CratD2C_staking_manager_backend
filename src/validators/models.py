@@ -61,7 +61,7 @@ class Validator(models.Model):
     )
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('-stake_amount', )
 
     @property
     def checkpoints(self):
@@ -79,4 +79,4 @@ class Validator(models.Model):
 
     @classmethod
     def validator_view_statuses(cls):
-        return [cls.ValidatorStatus.CREATED, cls.ValidatorStatus.HEALTHY, cls.ValidatorStatus.STOPPED]
+        return [cls.ValidatorStatus.HEALTHY, cls.ValidatorStatus.STOPPED]
