@@ -31,5 +31,6 @@ urlpatterns = [
 ]
 
 
-urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
-urlpatterns += staticfiles_urlpatterns()
+if config.DEBUG:
+    urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
+    urlpatterns += staticfiles_urlpatterns()

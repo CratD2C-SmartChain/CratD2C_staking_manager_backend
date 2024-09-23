@@ -23,6 +23,7 @@ class Config:
     SWAGGER_DESCRIPTION: str
     REDIS_HOST: str
     REDIS_PORT: str
+    API_KEY: str
     BLOCKCHAIN: Blockchain
     
 

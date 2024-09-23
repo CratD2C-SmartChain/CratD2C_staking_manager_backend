@@ -44,7 +44,10 @@ class Network:
 
     @property
     def block_number(self) -> int:
-        if self._block_number is None or (time.time() - self._block_time) > config.BLOCKCHAIN.BLOCK_REFRESH_TIME:
+        if (
+                self._block_number is None
+                or (time.time() - self._block_time) > config.BLOCKCHAIN.BLOCK_REFRESH_TIME
+        ):
             self._block_number = self.rpc.eth.block_number
             self._block_time = int(time.time())
         return self._block_number

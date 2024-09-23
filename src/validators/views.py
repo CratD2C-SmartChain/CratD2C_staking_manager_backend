@@ -19,13 +19,18 @@ from src.validators.serializers import (
 from src.validators.models import Validator
 from src.validators.utils import contract_processor
 from src.validators.paginators import ValidatorPagination
+from src.validators.permissions import TokenPermission
 
 
 class ValidatorView(ListCreateAPIView):
     model = Validator
     pagination_class = ValidatorPagination
     serializer_class = ValidatorSerializer
-    filter_backends = [django_filters.rest_framework.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [
+        django_filters.rest_framework.DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
     search_fields = ['=address', 'name']
 
     def get_queryset(self):
@@ -53,14 +58,16 @@ class ValidatorView(ListCreateAPIView):
         },
     )
     def post(self, request):
-        address = request.data.get("address", "")
+        serializer = ValidatorPostSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        address = serializer.validated_data['address']
         validator = Validator.objects.filter(address__iexact=address).first()
         if validator and validator.status == Validator.ValidatorStatus.ARCHIVED:
             validator.delete()
         serializer = ValidatorCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        instance = Validator.objects.get(address=serializer.validated_data['address'])
+        instance = Validator.objects.get(address=address)
         serializer = ValidatorSerializer(instance=instance)
         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
@@ -142,10 +149,13 @@ class ValidatorPostView(ListAPIView):
 
 class ValidatorPenaltyView(APIView):
 
+    permission_classes = [TokenPermission]
+
     def post(self, request):
         serializer = PenaltySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        validator = Validator.objects.filter(address__iexact=serializer.validated_data.get("address")).first()
+        address = serializer.validated_data.get("address")
+        validator = Validator.objects.filter(address__iexact=address).first()
         if validator:
             validator.penalty = validator.penalty + 1
             validator.save()

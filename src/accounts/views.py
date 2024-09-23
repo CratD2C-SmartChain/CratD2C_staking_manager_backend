@@ -66,13 +66,15 @@ class WalletConnectView(APIView):
 class GetWalletConnectMessage(APIView):
     """Generates message, that the user should sign via wallet extension for authorization"""
 
+    MESSAGE_LENGTH: int = 32
+
     @swagger_auto_schema(
         operation_description="Get message for wallet connection",
         responses={status.HTTP_200_OK: AuthMessageSerializer()},
     )
     def get(self, request: Request) -> Response:
         generated_message = "".join(
-            choice(ascii_letters) for _ in range(32)
+            choice(ascii_letters) for _ in range(self.MESSAGE_LENGTH)
         )
         request.session["metamask_message"] = generated_message
 
