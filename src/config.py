@@ -6,6 +6,15 @@ from marshmallow_dataclass import class_schema
 
 
 @dataclass
+class Blockchain:
+    MIN_VALIDATOR_AMOUNT: int
+    PROVIDER: str
+    STAKING_CONTRACT_ADDRESS: str
+    BLOCK_REFRESH_TIME: int
+    EPOCH_LEN: int
+
+
+@dataclass
 class Config:
     ALLOWED_HOSTS: list
     SECRET_KEY: str
@@ -13,6 +22,9 @@ class Config:
     SWAGGER_TITLE: str
     SWAGGER_DESCRIPTION: str
     REDIS_HOST: str
+    REDIS_PORT: str
+    API_KEY: str
+    BLOCKCHAIN: Blockchain
     
 
 config_path = "/../config.yaml"

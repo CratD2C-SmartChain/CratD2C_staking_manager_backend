@@ -10,7 +10,7 @@ services:
     container_name: cratd2c_stakingmanager_backend_db
   web: &web
     build:
-      context: cratd2c_stakingmanager_backend
+      context: .
       dockerfile: Dockerfile
     env_file:
       - ./.env
@@ -18,9 +18,11 @@ services:
       - "127.0.0.1:${DOCKER_EXPOSE_PORT?8000}:${DJANGO_PORT?8000}"
     depends_on:
       - db
+      - redis
     volumes:
       - ./src/:/code/src/
       - ./static/:/code/static/
+      - ./media/:/code/media/
       - ./logs:/code/logs/
     command: /runserver.sh
     restart: unless-stopped

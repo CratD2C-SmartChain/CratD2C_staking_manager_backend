@@ -35,7 +35,11 @@ INSTALLED_APPS = [
     "drf_yasg",
     "rest_framework",
     "rest_framework.authtoken",
+    "django_filters",
     "django_celery_beat",
+    "src.validators",
+    "src.accounts",
+    "src.statistic",
 ]
 
 MIDDLEWARE = [
@@ -121,6 +125,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+AUTH_USER_MODEL = "accounts.AdvUser"
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -135,7 +141,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
-    ]
+    ],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
 # Always use PTPython for shell_plus
@@ -152,3 +159,10 @@ SHELL_PLUS_IMPORTS = [
 ]
 CELERY_BROKER_URL = f"redis://{config.REDIS_HOST}:{config.REDIS_PORT}"
 CELERY_RESULT_BACKEND = f"redis://{config.REDIS_HOST}:{config.REDIS_PORT}"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{config.REDIS_HOST}:{config.REDIS_PORT}",
+    }
+}
