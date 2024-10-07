@@ -44,3 +44,6 @@ This project uses [pre-commit](https://pre-commit.com/). List of base linters:
 - black
 - flake8
 - isort
+
+### Docs
+[Download PDF](cratD2C_stakingManager_backend.pdf)
