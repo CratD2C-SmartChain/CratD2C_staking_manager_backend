@@ -1,6 +1,8 @@
+from django.core.validators import FileExtensionValidator
 from django.db import models
 
 from src.utilities import network, config
+from src.validators.validators import validate_image_size
 
 
 class Validator(models.Model):
@@ -18,7 +20,15 @@ class Validator(models.Model):
         db_index=True,
     )
     name = models.CharField(max_length=120, verbose_name="Name")
-    logo = models.ImageField(upload_to="validator_logo", verbose_name="Logo")
+    logo = models.ImageField(
+        upload_to="validator_logo",
+        verbose_name="Logo",
+        validators=[
+            FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png']),
+            validate_image_size
+        ]
+    )
+
     stake_amount = models.DecimalField(
         verbose_name="Stake Amount",
         decimal_places=0,
