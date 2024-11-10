@@ -12,7 +12,11 @@ class StatisticView(APIView):
 
     @method_decorator(cache_page(1200))
     def get(self, request):
-        interval = i_processor.get_interval()
+        try:
+            interval = i_processor.get_interval()
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
+
         return Response(f"{interval}", status=status.HTTP_200_OK)
 
 
