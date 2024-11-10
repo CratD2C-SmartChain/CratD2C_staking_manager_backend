@@ -32,7 +32,7 @@ class ContractProcessor:
             "from": address,
             "gasPrice": self.rpc.eth.gas_price,
             "chainId": self.rpc.eth.chain_id,
-            "nonce": self.rpc.eth.get_transaction_count(address),
+            "nonce": self.rpc.eth.get_transaction_count(address, "pending"),
             "gas": 1000000,
             "value": amount,
         }
