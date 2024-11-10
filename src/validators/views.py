@@ -20,7 +20,7 @@ from src.validators.serializers import (
 from src.validators.models import Validator
 from src.validators.utils import contract_processor
 from src.validators.paginators import ValidatorPagination
-from src.validators.permissions import TokenPermission
+from src.validators.permissions import HmacPermission
 from src.validators.errors import ValidatorAlreadyExists
 
 
@@ -155,7 +155,7 @@ class ValidatorPostView(ListAPIView):
 
 class ValidatorPenaltyView(APIView):
 
-    permission_classes = [TokenPermission]
+    permission_classes = [HmacPermission]
 
     def post(self, request):
         serializer = PenaltySerializer(data=request.data)
