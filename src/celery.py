@@ -3,8 +3,16 @@ import os
 from celery import Celery
 from celery.schedules import crontab
 
+from src.settings import CELERY_BROKER_USE_SSL, CELERY_BROKER_URL
+
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "src.settings")
-app = Celery("src")
+app = Celery(
+    "src",
+    broker=CELERY_BROKER_URL,
+    broker_use_ssl=CELERY_BROKER_USE_SSL,
+)
+
 
 app.config_from_object("django.conf:settings", namespace="CELERY")
 

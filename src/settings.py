@@ -1,4 +1,5 @@
 import os
+import ssl
 from pathlib import Path
 
 from .config import config
@@ -157,12 +158,29 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SHELL_PLUS_IMPORTS = [
     "from src.utilities import RedisClient",
 ]
-CELERY_BROKER_URL = f"redis://{config.REDIS_HOST}:{config.REDIS_PORT}"
-CELERY_RESULT_BACKEND = f"redis://{config.REDIS_HOST}:{config.REDIS_PORT}"
+
+CELERY_BROKER_URL = f'rediss://:{os.getenv("REDIS_PASSWORD")}@{os.getenv("REDIS_HOST")}:{os.getenv("REDIS_PORT")}'
+
+REDIS_CERTS_DIR = os.path.join(BASE_DIR, os.getenv("REDIS_CERTS_DIR"))
+
+CELERY_BROKER_USE_SSL = {
+    'ssl_cert_reqs': ssl.CERT_REQUIRED,
+    'ssl_ca_certs': os.path.join(REDIS_CERTS_DIR, 'ca.crt'),
+    'ssl_certfile': os.path.join(REDIS_CERTS_DIR, 'redis_server.crt'),
+    'ssl_keyfile': os.path.join(REDIS_CERTS_DIR, 'redis_server.key'),
+}
+CELERY_REDIS_BACKEND_USE_SSL = CELERY_BROKER_USE_SSL
+
 
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": f"redis://{config.REDIS_HOST}:{config.REDIS_PORT}",
+        "LOCATION": f'rediss://:{os.getenv("REDIS_PASSWORD")}@{os.getenv("REDIS_HOST")}:{os.getenv("REDIS_PORT")}',
+        "OPTIONS": {
+            "ssl_cert_reqs": ssl.CERT_REQUIRED,
+            "ssl_ca_certs": os.path.join(REDIS_CERTS_DIR, "ca.crt"),
+            "ssl_certfile": os.path.join(REDIS_CERTS_DIR, "redis_server.crt"),
+            "ssl_keyfile": os.path.join(REDIS_CERTS_DIR, "redis_server.key"),
+        },
     }
 }

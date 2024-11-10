@@ -24,21 +24,29 @@ services:
       - ./static/:/code/static/
       - ./media/:/code/media/
       - ./logs:/code/logs/
+      - ./${REDIS_CERTS_DIR}:/code/${REDIS_CERTS_DIR}
     command: /runserver.sh
     restart: unless-stopped
     networks:
       cratd2c_stakingmanager_backend_net:
     container_name: cratd2c_stakingmanager_backend_web
-
   redis:
-    image: redis:5.0
+    image: redis:7-alpine
     restart: unless-stopped
     volumes:
       - ./.docker/redis-data:/data
+      - ./${REDIS_CERTS_DIR}:/${REDIS_CERTS_DIR}
     networks:
       cratd2c_stakingmanager_backend_net:
     container_name: cratd2c_stakingmanager_backend_redis
-  
+    command: >
+      redis-server 
+      --tls-port ${REDIS_PORT}
+      --port 0
+      --tls-cert-file /${REDIS_CERTS_DIR}/redis_server.crt
+      --tls-key-file /${REDIS_CERTS_DIR}/redis_server.key
+      --tls-ca-cert-file /${REDIS_CERTS_DIR}/ca.crt
+      --requirepass "$REDIS_PASSWORD"
   celery:
     <<: *web
     image: celery:3.1
@@ -47,17 +55,20 @@ services:
       - redis
     volumes:
       - ./logs:/code/logs/
+      - ./${REDIS_CERTS_DIR}:/code/${REDIS_CERTS_DIR}
     ports: []
     container_name: cratd2c_stakingmanager_backend_celery
   celery_beat:
     <<: *web
     image: celery:3.1
+    volumes:
+      - ./logs:/code/logs/
+      - ./${REDIS_CERTS_DIR}:/code/${REDIS_CERTS_DIR}
     command: "celery -A src beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler"
     depends_on:
       - redis
     ports: []
     container_name: cratd2c_stakingmanager_backend_celery_beat
-  
 
 networks:
   cratd2c_stakingmanager_backend_net:

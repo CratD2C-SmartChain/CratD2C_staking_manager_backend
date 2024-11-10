@@ -11,3 +11,4 @@ Dockerfile
 docker-compose.yml
 /.docker
 logs/
+redis_certs/

@@ -1,18 +1,27 @@
+import os
+import ssl
 import time
 
 import redis
 from web3 import Web3, HTTPProvider
 from web3.middleware import geth_poa_middleware
 
-from src.settings import config
+from src.settings import REDIS_CERTS_DIR, config
 
 
 class RedisClient:
     def __init__(self) -> None:
         self.pool = redis.ConnectionPool(
-            host=config.REDIS_HOST,
-            port=config.REDIS_PORT,
+            host=os.getenv("REDIS_HOST"),
+            port=os.getenv("REDIS_PORT"),
+            password=os.getenv("REDIS_PASSWORD"),
             db=0,
+            connection_class=redis.SSLConnection,
+            decode_responses=True,
+            ssl_cert_reqs=ssl.CERT_REQUIRED,
+            ssl_ca_certs=os.path.join(REDIS_CERTS_DIR, 'ca.crt'),
+            ssl_certfile=os.path.join(REDIS_CERTS_DIR, 'redis_server.crt'),
+            ssl_keyfile=os.path.join(REDIS_CERTS_DIR, 'redis_server.key'),
         )
         self._conn = None
 
