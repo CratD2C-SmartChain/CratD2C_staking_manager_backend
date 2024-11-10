@@ -1,19 +1,12 @@
-from web3 import Web3
 from rest_framework import serializers
-from rest_framework.validators import ValidationError
+
+from src.shared.validators import ethereum_address_validator
 
 
 class WalletConnectSerializer(serializers.Serializer):
-    address = serializers.CharField(required=True)
+    address = serializers.CharField(required=True, validators=[ethereum_address_validator])
     signed_msg = serializers.CharField()
     message = serializers.CharField(min_length=32)
-
-    @classmethod
-    def validate_address(cls, value: str) -> str:
-        value = value if value.startswith("0x") else "0x" + value
-        if not Web3.is_address(value):
-            raise ValidationError("Address validation error")
-        return value
 
 
 class AuthTokenSerializer(serializers.Serializer):

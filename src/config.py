@@ -8,6 +8,8 @@ from marshmallow_dataclass import class_schema
 @dataclass
 class Blockchain:
     MIN_VALIDATOR_AMOUNT: int
+    MIN_VALIDATOR_COMMISSION: int
+    MAX_VALIDATOR_COMMISSION: int
     PROVIDER: str
     STAKING_CONTRACT_ADDRESS: str
     BLOCK_REFRESH_TIME: int

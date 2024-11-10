@@ -1,9 +1,17 @@
 DEBUG: true
-SECRET_KEY: 'Django secret key'
-ALLOWED_HOSTS: 
-  - 'localhost'
+SECRET_KEY: django-secret-key
+ALLOWED_HOSTS:
+  - localhost
 SWAGGER_TITLE: cratd2c_stakingManager_backend
-SWAGGER_DESCRIPTION: 'API for cratd2c_stakingManager_backend'
-
-REDIS_HOST: 'redis'
-REDIS_PORT: '6379'
+SWAGGER_DESCRIPTION: API for cratd2c_stakingManager_backend
+REDIS_HOST: redis
+REDIS_PORT: 6379
+API_KEY: api-key
+BLOCKCHAIN:
+  MIN_VALIDATOR_AMOUNT: 100000000000000000000000
+  MIN_VALIDATOR_COMMISSION: 500
+  MAX_VALIDATOR_COMMISSION: 3000
+  PROVIDER: https://cratd2c-testnet-node1.cratd2csmartchain.io/
+  STAKING_CONTRACT_ADDRESS: "0xe066196C3496c8A38BB9c488A7A240C840b71595"
+  BLOCK_REFRESH_TIME: 10
+  EPOCH_LEN: 900

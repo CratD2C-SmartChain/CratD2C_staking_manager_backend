@@ -2,10 +2,12 @@ from rest_framework import serializers
 from web3 import Web3
 from drf_extra_fields.fields import Base64ImageField
 
-from src.validators.models import Validator
-from src.validators.errors import AddressError, BalanceError
+from src.config import config
 from src.utilities import network
-
+from src.shared.constants import MAX_UINT256
+from src.shared.validators import ethereum_address_validator
+from src.validators.models import Validator
+from src.validators.errors import BalanceError
 
 class ValidatorSerializer(serializers.ModelSerializer):
     checkpoints = serializers.ReadOnlyField(read_only=True)
@@ -18,6 +20,11 @@ class ValidatorSerializer(serializers.ModelSerializer):
 
 class ValidatorCreateSerializer(serializers.ModelSerializer):
     logo = Base64ImageField(required=True)
+    address = serializers.CharField(validators=[ethereum_address_validator])
+    commission = serializers.IntegerField(
+        min_value=config.BLOCKCHAIN.MIN_VALIDATOR_COMMISSION, 
+        max_value=config.BLOCKCHAIN.MAX_VALIDATOR_COMMISSION,
+    )
 
     class Meta:
         model = Validator
@@ -31,13 +38,6 @@ class ValidatorCreateSerializer(serializers.ModelSerializer):
             'telegram',
             'website',
         )
-
-    def validate_address(self, value):
-        value = value if value.startswith("0x") else "0x" + value
-        if not Web3.is_address(value):
-            raise AddressError
-        self.check_balance(value)
-        return value
 
     @classmethod
     def check_balance(cls, address):
@@ -61,17 +61,31 @@ class ValidatorUpdateSerializer(serializers.ModelSerializer):
 class ValidatorPostSerializer(serializers.Serializer):
     addresses = serializers.CharField(required=True)
 
+    @classmethod
+    def validate_addresses(cls, addresses):
+        for address in addresses.split(","):
+            if not Web3.is_address(address):
+                raise serializers.ValidationError(f"Invalid address: {address}")
+            
+        return addresses
+
 
 class ValidatorSetUpSerializer(serializers.Serializer):
-    address = serializers.CharField()
-    commission = serializers.IntegerField()
-    amount = serializers.IntegerField()
+    address = serializers.CharField(validators=[ethereum_address_validator])
+    commission = serializers.IntegerField(
+        min_value=config.BLOCKCHAIN.MIN_VALIDATOR_COMMISSION, 
+        max_value=config.BLOCKCHAIN.MAX_VALIDATOR_COMMISSION,
+    )
+    amount = serializers.IntegerField(
+        min_value=config.BLOCKCHAIN.MIN_VALIDATOR_AMOUNT, 
+        max_value=MAX_UINT256,
+    )
 
 
 class TransactionSerializer(serializers.Serializer):
     tx_hash = serializers.CharField()
-    address = serializers.CharField()
+    address = serializers.CharField(validators=[ethereum_address_validator])
 
 
 class PenaltySerializer(serializers.Serializer):
-    address = serializers.CharField()
+    address = serializers.CharField(validators=[ethereum_address_validator])
