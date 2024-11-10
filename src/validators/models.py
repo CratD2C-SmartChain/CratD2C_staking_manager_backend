@@ -2,7 +2,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 
 from src.utilities import network, config
-from src.validators.validators import validate_image_size
+from src.validators.validators import validate_image_size, ethereum_address_validator
 
 
 class Validator(models.Model):
@@ -54,6 +54,7 @@ class Validator(models.Model):
         max_length=128,
         verbose_name="Address",
         unique=True,
+        validators=[ethereum_address_validator],
     )
     description = models.TextField(
         verbose_name="Description",
