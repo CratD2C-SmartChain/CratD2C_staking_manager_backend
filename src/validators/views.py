@@ -6,6 +6,7 @@ from drf_yasg.utils import swagger_auto_schema
 import django_filters.rest_framework
 from rest_framework import filters
 from django.db.models import Q
+from django.db.transaction import atomic
 
 from src.validators.serializers import (
     ValidatorSerializer,
@@ -20,6 +21,7 @@ from src.validators.models import Validator
 from src.validators.utils import contract_processor
 from src.validators.paginators import ValidatorPagination
 from src.validators.permissions import TokenPermission
+from src.validators.errors import ValidatorAlreadyExists
 
 
 class ValidatorView(ListCreateAPIView):
@@ -58,17 +60,21 @@ class ValidatorView(ListCreateAPIView):
         },
     )
     def post(self, request):
-        serializer = ValidatorPostSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        address = serializer.validated_data['address']
-        validator = Validator.objects.filter(address__iexact=address).first()
-        if validator and validator.status == Validator.ValidatorStatus.ARCHIVED:
-            validator.delete()
         serializer = ValidatorCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        instance = Validator.objects.get(address=address)
-        serializer = ValidatorSerializer(instance=instance)
+        address = serializer.validated_data['address']
+        with atomic():
+            validator = Validator.objects.select_for_update().filter(address__iexact=address).first()
+            if validator:
+                if validator.status == Validator.ValidatorStatus.ARCHIVED:
+                    validator.delete()
+                    validator = serializer.save()
+                else:
+                    raise ValidatorAlreadyExists
+            else:
+                validator = serializer.save()
+      
+        serializer = ValidatorSerializer(instance=validator)
         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
 
