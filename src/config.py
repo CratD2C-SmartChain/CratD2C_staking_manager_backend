@@ -24,6 +24,7 @@ class Config:
     SWAGGER_TITLE: str
     SWAGGER_DESCRIPTION: str
     API_KEY: str
+    WALLET_CONNECT_MESSAGE_EXPIRATION_SECONDS: int
     BLOCKCHAIN: Blockchain
     
 

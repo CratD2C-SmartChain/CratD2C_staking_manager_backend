@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
+from django.db import transaction
 from drf_yasg.utils import swagger_auto_schema
 from eth_account.messages import encode_defunct
 from rest_framework.authtoken.models import Token
@@ -15,9 +16,12 @@ from src.accounts.errors import InvalidWalletSignature
 from src.accounts.serializers import (
     AuthMessageSerializer,
     AuthTokenSerializer,
+    WalletConnectAddressSerializer,
     WalletConnectSerializer,
 )
-from src.utilities import network
+from src.config import config
+from src.accounts.utils import build_wallet_connect_message_key
+from src.utilities import network, RedisClient
 
 
 class WalletConnectView(APIView):
@@ -32,16 +36,24 @@ class WalletConnectView(APIView):
         },
     )
     def post(self, request: Request):
+        redis = RedisClient()
         serializer = WalletConnectSerializer(data=request.data)
-        serializer.is_valid()
-        if serializer.errors:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        address = serializer.validated_data.get("address")
+        message = serializer.validated_data.get("message")
+        signature = serializer.validated_data.get("signed_msg")
+        message_key = build_wallet_connect_message_key(message)
+        cached_address = redis.connection.get(message_key)
 
-        address = serializer.data.get("address")
-
-        message_hash = encode_defunct(text=serializer.data.get("message"))
+        if not cached_address:
+            raise InvalidWalletSignature
+        
+        if address.lower() != cached_address.lower():
+            raise InvalidWalletSignature
+        
+        ecnoded_message = encode_defunct(text=message)
         recovered_address = network.rpc.eth.account.recover_message(
-            message_hash, signature=serializer.data.get("signed_msg")
+            ecnoded_message, signature=signature
         )
         if address.lower() != recovered_address.lower():
             raise InvalidWalletSignature
@@ -50,38 +62,44 @@ class WalletConnectView(APIView):
             username__iexact=address,
             defaults={"username": Web3.to_checksum_address(address)},
         )
+        with transaction.atomic():
+            Token.objects.filter(user=eth_user).delete()
+            token = Token.objects.create(user=eth_user)
 
-        Token.objects.filter(user=eth_user).delete()
-        token = Token.objects.create(user=eth_user)
+        redis.connection.delete(message_key)
 
-        response_serializer = AuthTokenSerializer(data={"token": token.key})
-        response_serializer.is_valid()
-
+        response = AuthTokenSerializer(data={"token": token.key})
+        response.is_valid(raise_exception=True)
         return Response(
-            data=response_serializer.validated_data,
+            data=response.data,
             status=status.HTTP_200_OK,
         )
 
 
-class GetWalletConnectMessage(APIView):
+
+class WalletConnectMessageView(APIView):
     """Generates message, that the user should sign via wallet extension for authorization"""
 
     MESSAGE_LENGTH: int = 32
 
     @swagger_auto_schema(
-        operation_description="Get message for wallet connection",
+        request_body=WalletConnectAddressSerializer,
+        operation_description="Create message for wallet connection",
         responses={status.HTTP_200_OK: AuthMessageSerializer()},
     )
-    def get(self, request: Request) -> Response:
-        generated_message = "".join(
+    def post(self, request: Request) -> Response:
+        redis = RedisClient()
+        serializer = WalletConnectAddressSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        message = "".join(
             choice(ascii_letters) for _ in range(self.MESSAGE_LENGTH)
         )
-        request.session["metamask_message"] = generated_message
-
-        serializer = AuthMessageSerializer(data={"message": generated_message})
-        serializer.is_valid()
-
-        if serializer.errors:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(data=serializer.validated_data, status=status.HTTP_200_OK)
+        redis.connection.set(
+            build_wallet_connect_message_key(message),
+            serializer.validated_data.get("address"),
+            config.WALLET_CONNECT_MESSAGE_EXPIRATION_SECONDS,
+        )
+        response = AuthMessageSerializer(data={"message": message})
+        response.is_valid(raise_exception=True)
+        return Response(data=response.data, status=status.HTTP_200_OK)

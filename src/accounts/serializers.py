@@ -16,3 +16,7 @@ class AuthTokenSerializer(serializers.Serializer):
 
 class AuthMessageSerializer(serializers.Serializer):
     message = serializers.CharField(max_length=128)
+
+
+class WalletConnectAddressSerializer(serializers.Serializer):
+    address = serializers.CharField(required=True, validators=[ethereum_address_validator])
