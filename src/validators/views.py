@@ -2,6 +2,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView, UpdateAPIView, ListAPIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import permission_classes
 from drf_yasg.utils import swagger_auto_schema
 import django_filters.rest_framework
 from rest_framework import filters
@@ -21,7 +23,7 @@ from src.validators.models import Validator
 from src.validators.utils import contract_processor
 from src.validators.paginators import ValidatorPagination
 from src.validators.permissions import HmacPermission
-from src.validators.errors import ValidatorAlreadyExists
+from src.validators.errors import ValidatorAddressDismatchError, ValidatorAlreadyExists
 
 
 class ValidatorView(ListCreateAPIView):
@@ -86,6 +88,8 @@ class ValidatorUpdateView(UpdateAPIView):
 
 
 class SetUpValidatorView(APIView):
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         operation_description="Get transaction payload",
         query_serializer=ValidatorSetUpSerializer(),
@@ -94,8 +98,12 @@ class SetUpValidatorView(APIView):
     def get(self, request):
         serializer = ValidatorSetUpSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
-        validator_address = serializer.validated_data.get("address")
-        validator = Validator.objects.filter(address__iexact=validator_address).first()
+        address = serializer.validated_data.get("address")
+
+        if address.lower() != request.user.username.lower():
+            raise ValidatorAddressDismatchError
+        
+        validator = Validator.objects.filter(address__iexact=address).first()
         if validator is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         data = contract_processor.deposit_as_validator(
