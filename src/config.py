@@ -19,11 +19,11 @@ class Blockchain:
 @dataclass
 class Config:
     ALLOWED_HOSTS: list
-    SECRET_KEY: str
+    SECRET_KEY_ENCRYPTED: str
     DEBUG: bool
     SWAGGER_TITLE: str
     SWAGGER_DESCRIPTION: str
-    API_KEY: str
+    API_KEY_ENCRYPTED: str
     WALLET_CONNECT_MESSAGE_EXPIRATION_SECONDS: int
     BLOCKCHAIN: Blockchain
     

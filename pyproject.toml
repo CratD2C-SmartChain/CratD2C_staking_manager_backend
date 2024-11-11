@@ -28,6 +28,7 @@ pillow = "^10.4.0"
 django-filter = "^24.2"
 drf-extra-fields = "^3.7.0"
 shyaml = "^0.6.2"
+cryptography = "^43.0.3"
 
 
 [build-system]

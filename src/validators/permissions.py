@@ -5,7 +5,7 @@ import json
 from django.utils.encoding import force_bytes
 from rest_framework.permissions import BasePermission
 
-from src.config import config
+from src.settings import API_KEY
 
 
 class HmacPermission(BasePermission):
@@ -25,7 +25,7 @@ class HmacPermission(BasePermission):
             bool: True if the token is valid, False otherwise.
         """
         expected_signature = hmac.new(
-            force_bytes(config.API_KEY),
+            force_bytes(API_KEY),
             force_bytes(json.dumps(request.data, separators=(",", ":"))),
             hashlib.sha256
         ).hexdigest()

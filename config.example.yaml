@@ -1,10 +1,10 @@
 DEBUG: true
-SECRET_KEY: django-secret-key
+SECRET_KEY_ENCRYPTED: django-secret-key-encrypted
 ALLOWED_HOSTS:
   - localhost
 SWAGGER_TITLE: cratd2c_stakingManager_backend
 SWAGGER_DESCRIPTION: API for cratd2c_stakingManager_backend
-API_KEY: api-key
+API_KEY_ENCRYPTED: api-key-encrypted
 WALLET_CONNECT_MESSAGE_EXPIRATION_SECONDS: 120
 BLOCKCHAIN:
   MIN_VALIDATOR_AMOUNT: 100000000000000000000000
