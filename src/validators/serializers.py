@@ -3,11 +3,9 @@ from web3 import Web3
 from drf_extra_fields.fields import Base64ImageField
 
 from src.config import config
-from src.utilities import network
 from src.shared.constants import MAX_UINT256
 from src.shared.validators import ethereum_address_validator
 from src.validators.models import Validator
-from src.validators.errors import BalanceError
 
 class ValidatorSerializer(serializers.ModelSerializer):
     checkpoints = serializers.ReadOnlyField(read_only=True)
@@ -38,11 +36,6 @@ class ValidatorCreateSerializer(serializers.ModelSerializer):
             'telegram',
             'website',
         )
-
-    @classmethod
-    def check_balance(cls, address):
-        if not network.check_balance(address):
-            raise BalanceError
 
 
 class ValidatorUpdateSerializer(serializers.ModelSerializer):

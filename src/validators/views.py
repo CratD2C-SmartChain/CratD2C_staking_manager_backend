@@ -10,6 +10,7 @@ from rest_framework import filters
 from django.db.models import Q
 from django.db.transaction import atomic
 
+from src.utilities import network
 from src.validators.serializers import (
     ValidatorSerializer,
     ValidatorCreateSerializer,
@@ -23,7 +24,7 @@ from src.validators.models import Validator
 from src.validators.utils import contract_processor
 from src.validators.paginators import ValidatorPagination
 from src.validators.permissions import HmacPermission
-from src.validators.errors import ValidatorAddressDismatchError, ValidatorAlreadyExists
+from src.validators.errors import ValidatorAddressDismatchError, ValidatorAlreadyExists, BalanceError
 
 
 class ValidatorView(ListCreateAPIView):
@@ -65,6 +66,10 @@ class ValidatorView(ListCreateAPIView):
         serializer = ValidatorCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         address = serializer.validated_data['address']
+
+        if not network.check_balance(address):
+            raise BalanceError
+        
         with atomic():
             validator = Validator.objects.select_for_update().filter(address__iexact=address).first()
             if validator:
