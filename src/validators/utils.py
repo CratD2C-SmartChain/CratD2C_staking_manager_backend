@@ -1,7 +1,34 @@
+import logging
+
+import requests.exceptions
+import web3.exceptions
 from web3 import Web3
 
 from src.abi import staking_abi
 from src.utilities import config, network
+
+
+logger = logging.getLogger(__name__)
+
+
+class ContractProcessorError(Exception):
+    pass
+
+
+def rpc_errors_handler(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except requests.exceptions.ConnectionError as e:
+            msg = f"Cannot process request due to connection error: {e}"
+            logger.error(msg)
+            raise ContractProcessorError(msg)
+        except web3.exceptions.Web3Exception as e:
+            msg = f"Cannot process request due to web3 error: {e}"
+            logger.error(msg)
+            raise ContractProcessorError(msg)
+        
+    return wrapper
 
 
 class ContractProcessor:
@@ -27,6 +54,7 @@ class ContractProcessor:
         tx = cd.build_transaction(self.get_tx_params(amount, address))
         return tx
 
+    @rpc_errors_handler
     def get_tx_params(self, amount, address) -> dict:
         data = {
             "from": address,
@@ -38,31 +66,37 @@ class ContractProcessor:
         }
         return data
 
+    @rpc_errors_handler
     def get_block_from_tx(self, tx_hash, address_from):
         tx = self.rpc.eth.get_transaction(tx_hash)
         if tx["from"] == address_from:
             return tx["blockNumber"]
         return None
 
+    @rpc_errors_handler
     def get_active_validators_info(self) -> tuple:
         validators, amounts = self.contract.functions.getActiveValidators().call()
         amounts = [sum(a) for a in amounts]
         return validators, amounts
 
+    @rpc_errors_handler
     def get_stopped_validators_info(self) -> tuple:
         validators, amounts = self.contract.functions.getStoppedValidators().call()
         amounts = [sum(a) for a in amounts]
         return validators, amounts
 
+    @rpc_errors_handler
     def is_validator_active(self, address):
         address = self.rpc.to_checksum_address(address)
         is_validator = self.contract.functions.isValidator(address).call()
         return is_validator
 
+    @rpc_errors_handler
     def get_validator_info(self, address):
         info = self.contract.functions.getValidatorInfo(address).call()
         return info[0] + info[8] + info[9]
 
+    @rpc_errors_handler
     def get_delegator_info_per_validator(self, address) -> set:
         delegators, *_ = self.contract.functions.getDelegatorsInfoPerValidator(address).call()
         return set(delegators)

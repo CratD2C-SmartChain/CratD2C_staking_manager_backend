@@ -21,7 +21,7 @@ from src.validators.serializers import (
     PenaltySerializer,
 )
 from src.validators.models import Validator
-from src.validators.utils import contract_processor
+from src.validators.utils import contract_processor, ContractProcessorError
 from src.validators.paginators import ValidatorPagination
 from src.validators.permissions import HmacPermission
 from src.validators.errors import ValidatorAddressDismatchError, ValidatorAlreadyExists, BalanceError
@@ -111,11 +111,16 @@ class SetUpValidatorView(APIView):
         validator = Validator.objects.filter(address__iexact=address).first()
         if validator is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        data = contract_processor.deposit_as_validator(
-            serializer.validated_data.get("commission"),
-            serializer.validated_data.get("amount"),
-            validator.address,
-        )
+        
+        try:
+            data = contract_processor.deposit_as_validator(
+                serializer.validated_data.get("commission"),
+                serializer.validated_data.get("amount"),
+                validator.address,
+            )
+        except ContractProcessorError as e:
+            return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
+        
         return Response(data=data, status=status.HTTP_200_OK)
 
 
@@ -128,10 +133,15 @@ class GetTransactionView(APIView):
     def get(self, request):
         serializer = TransactionSerializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
-        block = contract_processor.get_block_from_tx(
-            serializer.validated_data.get("tx_hash"),
-            serializer.validated_data.get("address"),
-        )
+
+        try:
+            block = contract_processor.get_block_from_tx(
+                serializer.validated_data.get("tx_hash"),
+                serializer.validated_data.get("address"),
+            )
+        except ContractProcessorError as e:
+            return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
+        
         if block is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         validator = Validator.objects.filter(address__iexact=serializer.validated_data.get("address")).first()
