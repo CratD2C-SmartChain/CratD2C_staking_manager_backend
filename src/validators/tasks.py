@@ -7,10 +7,9 @@ from src.validators.models import Validator
 
 @shared_task(name="update_active_validators_amounts")
 def update_active_validators_amounts():
-    validators, amount = contract_processor.get_active_validators_info()
-    data = zip(validators, amount)
-    for address, amount in data:
-        with transaction.atomic():
+    validators, amounts = contract_processor.get_active_validators_info()
+    with transaction.atomic():
+        for address, amount in zip(validators, amounts):
             validator = Validator.objects.select_for_update().filter(address__iexact=address).first()
             if validator:
                 validator.stake_amount = amount
@@ -18,13 +17,13 @@ def update_active_validators_amounts():
                     validator.status = Validator.ValidatorStatus.HEALTHY
                 validator.save()
 
-    db_validators = Validator.objects.filter(
-        status=Validator.ValidatorStatus.HEALTHY).values_list('address', flat=True)
-    validators_contract_set = set(validators)
-    validators_db_set = set(db_validators)
-    difference = validators_db_set.difference(validators_contract_set)
-    for address in difference:
-        with transaction.atomic():
+        db_validators = Validator.objects.filter(
+            status=Validator.ValidatorStatus.HEALTHY).values_list('address', flat=True)
+        validators_contract_set = set(validators)
+        validators_db_set = set(db_validators)
+        difference = validators_db_set.difference(validators_contract_set)
+
+        for address in difference:
             validator = Validator.objects.select_for_update().filter(address__iexact=address).first()
             if validator:
                 validator.status = Validator.ValidatorStatus.STOPPED
@@ -34,17 +33,19 @@ def update_active_validators_amounts():
 @shared_task(name="update_archived_validators")
 def update_archived_validators():
     validators, amounts = contract_processor.get_stopped_validators_info()
-    for i, validator in enumerate(validators):
-        with transaction.atomic():
+    with transaction.atomic():
+        for address, amount in zip(validators, amounts):
             db_validator = Validator.objects.select_for_update().filter(address__iexact=validator).first()
             if db_validator:
-                db_validator.stake_amount = amounts[i]
+                db_validator.stake_amount = amount
                 db_validator.save()
-    db_validators = Validator.objects.filter(status=Validator.ValidatorStatus.STOPPED).values_list('address', flat=True)
-    validators_db_set = set(db_validators)
-    difference = validators_db_set.difference(validators)
-    for address in difference:
-        with transaction.atomic():
+
+        db_validators = Validator.objects.filter(status=Validator.ValidatorStatus.STOPPED).values_list('address', flat=True)
+        validators_contract_set = set(validators)
+        validators_db_set = set(db_validators)
+        difference = validators_db_set.difference(validators_contract_set)
+
+        for address in difference:
             validator = Validator.objects.select_for_update().filter(address__iexact=address).first()
             if validator:
                 is_validator = contract_processor.is_validator_active(address)
