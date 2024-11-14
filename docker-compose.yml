@@ -8,7 +8,7 @@ services:
     networks:
       cratd2c_stakingmanager_backend_net:
     container_name: cratd2c_stakingmanager_backend_db
-  web: &web
+  web:
     build:
       context: .
       dockerfile: Dockerfile
@@ -25,6 +25,12 @@ services:
       - ./media/:/code/media/
       - ./logs:/code/logs/
       - ./${REDIS_CERTS_DIR}:/code/${REDIS_CERTS_DIR}
+    healthcheck:
+      test: "curl --fail http://localhost:${DJANGO_PORT?8000}/api/v1/healthcheck/ || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     command: /runserver.sh
     restart: unless-stopped
     networks:
@@ -48,26 +54,37 @@ services:
       --tls-ca-cert-file /${REDIS_CERTS_DIR}/ca.crt
       --requirepass "$REDIS_PASSWORD"
   celery:
-    <<: *web
-    image: celery:3.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - ./.env
     command: "celery -A src worker -l info"
     depends_on:
       - redis
     volumes:
       - ./logs:/code/logs/
       - ./${REDIS_CERTS_DIR}:/code/${REDIS_CERTS_DIR}
-    ports: []
+    restart: unless-stopped
+    networks:
+      cratd2c_stakingmanager_backend_net:
     container_name: cratd2c_stakingmanager_backend_celery
+
   celery_beat:
-    <<: *web
-    image: celery:3.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - ./.env
     volumes:
       - ./logs:/code/logs/
       - ./${REDIS_CERTS_DIR}:/code/${REDIS_CERTS_DIR}
     command: "celery -A src beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler"
     depends_on:
       - redis
-    ports: []
+    restart: unless-stopped
+    networks:
+      cratd2c_stakingmanager_backend_net:
     container_name: cratd2c_stakingmanager_backend_celery_beat
 
 networks:

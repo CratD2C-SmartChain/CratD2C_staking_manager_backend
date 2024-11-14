@@ -1,5 +1,6 @@
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.http.response import HttpResponse
 from django.urls import path, include
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
@@ -25,6 +26,7 @@ urlpatterns = [
         schema_view.with_ui("swagger", cache_timeout=0),
         name="schema-swagger-ui",
     ),
+    path("api/v1/healthcheck/", lambda r: HttpResponse()),
     path("api/v1/validators/", include("src.validators.urls")),
     path("api/v1/accounts/", include("src.accounts.urls")),
     path("api/v1/staticstic/", include("src.statistic.urls")),
